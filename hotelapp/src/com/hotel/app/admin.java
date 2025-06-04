@@ -1,153 +1,156 @@
 package com.hotel.app;
 
 import com.all.search.*;
+import com.hotel.ui.AnimationManager;
+import com.hotel.ui.ModernTheme;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.geom.RoundRectangle2D;
 
 public class admin extends JFrame {
+    private JPanel contentPanel;
+    
     public admin() {
-        setTitle("酒店住房管理系统"); // 设置窗口标题
-        setSize(500, 300); // 设置窗口大小
-        setLocationRelativeTo(null); // 将窗口位置设置为屏幕中央
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // 设置窗口关闭时结束所有程序
-
-        setLayout(new GridLayout(5, 3)); // 使用5行3列的网格布局
-
-        // 创建并添加"删除用户"按钮
-        JButton deleteClientBtn = new JButton("删除用户");
-        deleteClientBtn.addActionListener(new ActionListener() {
+        // 应用现代主题
+        ModernTheme.applyTheme();
+        
+        setTitle("酒店管理系统 - 传统面板");
+        setSize(850, 650);
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // 关闭窗口时不退出整个应用
+        
+        // 创建主内容面板
+        contentPanel = new JPanel(new BorderLayout(10, 10));
+        contentPanel.setBackground(ModernTheme.BACKGROUND_COLOR);
+        contentPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
+        
+        // 创建顶部标题面板
+        JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.setBackground(ModernTheme.PRIMARY_DARK_COLOR);
+        topPanel.setBorder(new EmptyBorder(15, 20, 15, 20));
+        
+        JLabel titleLabel = new JLabel("传统管理面板");
+        titleLabel.setFont(new Font("微软雅黑", Font.BOLD, 20));
+        titleLabel.setForeground(Color.WHITE);
+        
+        JButton backButton = new JButton("返回主菜单");
+        backButton.setForeground(Color.WHITE);
+        backButton.setBackground(null);
+        backButton.setBorderPainted(false);
+        backButton.setFocusPainted(false);
+        backButton.setContentAreaFilled(false);
+        backButton.setFont(ModernTheme.REGULAR_FONT);
+        backButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        backButton.addActionListener(e -> {
+            dispose(); // 关闭当前窗口
+        });
+        
+        topPanel.add(titleLabel, BorderLayout.WEST);
+        topPanel.add(backButton, BorderLayout.EAST);
+        
+        // 创建功能按钮面板
+        JPanel buttonPanel = new JPanel(new GridLayout(5, 3, 15, 15));
+        buttonPanel.setOpaque(false);
+        buttonPanel.setBorder(new EmptyBorder(20, 0, 0, 0));
+        
+        // 用户管理按钮
+        buttonPanel.add(createFunctionButton("添加用户", "user_add", ModernTheme.PRIMARY_COLOR, e -> add_client.main(new String[]{})));
+        buttonPanel.add(createFunctionButton("删除用户", "user_delete", ModernTheme.ERROR_COLOR, e -> delete_client.main(new String[]{})));
+        buttonPanel.add(createFunctionButton("用户信息管理", "user_edit", ModernTheme.ACCENT_COLOR, e -> alter_client.main(new String[]{})));
+        
+        // 房间管理按钮
+        buttonPanel.add(createFunctionButton("添加房间", "room_add", ModernTheme.PRIMARY_COLOR, e -> add_room.main(new String[]{})));
+        buttonPanel.add(createFunctionButton("删除房间", "room_delete", ModernTheme.ERROR_COLOR, e -> delete_room.main(new String[]{})));
+        buttonPanel.add(createFunctionButton("房间信息管理", "room_edit", ModernTheme.ACCENT_COLOR, e -> alter_room.main(new String[]{})));
+        
+        // 负责人管理按钮
+        buttonPanel.add(createFunctionButton("添加负责人", "leader_add", ModernTheme.PRIMARY_COLOR, e -> add_leader.main(new String[]{})));
+        buttonPanel.add(createFunctionButton("删除负责人", "leader_delete", ModernTheme.ERROR_COLOR, e -> delete_leader.main(new String[]{})));
+        buttonPanel.add(createFunctionButton("负责人信息管理", "leader_edit", ModernTheme.ACCENT_COLOR, e -> alter_leader.main(new String[]{})));
+        
+        // 入住退房管理按钮
+        buttonPanel.add(createFunctionButton("入住管理", "check_in", new Color(46, 204, 113), e -> checkIn.main(new String[]{})));
+        buttonPanel.add(createFunctionButton("退房管理", "check_out", new Color(231, 76, 60), e -> checkOut.main(new String[]{})));
+        buttonPanel.add(createFunctionButton("换房管理", "change_room", new Color(230, 126, 34), e -> changeRoom.main(new String[]{})));
+        
+        // 查看所有房间信息
+        buttonPanel.add(createFunctionButton("所有房间信息", "room_all", new Color(52, 152, 219), e -> allRoom.main(new String[]{})));
+        
+        // 添加到内容面板
+        contentPanel.add(topPanel, BorderLayout.NORTH);
+        contentPanel.add(buttonPanel, BorderLayout.CENTER);
+        
+        // 添加到窗口
+        add(contentPanel);
+        
+        // 显示窗口
+        setVisible(true);
+        
+        // 应用淡入动画
+        AnimationManager.fadeIn(contentPanel, 300);
+    }
+    
+    /**
+     * 创建功能按钮
+     */
+    private JPanel createFunctionButton(String text, String iconName, Color color, ActionListener action) {
+        JPanel panel = new JPanel() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                delete_client.main(new String[]{});
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                // 绘制背景
+                g2d.setColor(ModernTheme.CARD_COLOR);
+                g2d.fill(new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), 15, 15));
+                
+                // 绘制顶部颜色条
+                g2d.setColor(color);
+                g2d.fill(new RoundRectangle2D.Double(0, 0, getWidth(), 5, 0, 0));
+                
+                g2d.dispose();
+            }
+        };
+        
+        panel.setLayout(new BorderLayout());
+        panel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        panel.setOpaque(false);
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        
+        // 创建按钮文本
+        JLabel label = new JLabel(text, SwingConstants.CENTER);
+        label.setFont(ModernTheme.HEADER_FONT);
+        label.setForeground(ModernTheme.TEXT_PRIMARY);
+        
+        panel.add(label, BorderLayout.CENTER);
+        
+        // 添加鼠标效果
+        panel.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                panel.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createEmptyBorder(10, 10, 10, 10),
+                    BorderFactory.createLineBorder(color, 1, true)
+                ));
+            }
+            
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+            }
+            
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                action.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
             }
         });
-
-        // 创建并添加"删除房间"按钮
-        JButton deleteRoomBtn = new JButton("删除房间");
-        deleteRoomBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                delete_room.main(new String[]{});
-            }
-        });
-
-        // 创建并添加"删除负责人"按钮
-        JButton deleteLeaderBtn = new JButton("删除负责人");
-        deleteLeaderBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                delete_leader.main(new String[]{});
-            }
-        });
-
-        // 创建并添加"添加用户"按钮
-        JButton addClientBtn = new JButton("添加用户");
-        addClientBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                add_client.main(new String[]{});
-            }
-        });
-
-        // 创建并添加"添加房间"按钮
-        JButton addRoomBtn = new JButton("添加房间");
-        addRoomBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                add_room.main(new String[]{});
-            }
-        });
-
-        // 创建并添加"添加负责人"按钮
-        JButton addLeaderBtn = new JButton("添加负责人");
-        addLeaderBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                add_leader.main(new String[]{});
-            }
-        });
-
-        // 创建并添加"入住管理"按钮
-        JButton checkInBtn = new JButton("入住管理");
-        checkInBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                checkIn.main(new String[]{});
-            }
-        });
-
-        // 创建并添加"退房管理"按钮
-        JButton checkOutBtn = new JButton("退房管理");
-        checkOutBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                checkOut.main(new String[]{});
-            }
-        });
-
-        // 创建并添加"换房管理"按钮
-        JButton changeRoomBtn = new JButton("换房管理");
-        changeRoomBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                changeRoom.main(new String[]{});
-            }
-        });
-
-        // 创建并添加"用户信息管理"按钮
-        JButton alterClientBtn = new JButton("用户信息管理");
-        alterClientBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                alter_client.main(new String[]{});
-            }
-        });
-
-        // 创建并添加"房间信息管理"按钮
-        JButton alterRoomBtn = new JButton("房间信息管理");
-        alterRoomBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                alter_room.main(new String[]{});
-            }
-        });
-
-        // 创建并添加"负责人信息管理"按钮
-        JButton alterLeaderBtn = new JButton("负责人信息管理");
-        alterLeaderBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                alter_leader.main(new String[]{});
-            }
-        });
-        // 创建并添加"所有房间信息"按钮
-        JButton allRoomBtn = new JButton("所有房间信息");
-        allRoomBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                allRoom.main(new String[]{});
-            }
-        });
-
-        // 将按钮添加到窗口中
-        add(deleteClientBtn);
-        add(deleteRoomBtn);
-        add(deleteLeaderBtn);
-        add(addClientBtn);
-        add(addRoomBtn);
-        add(addLeaderBtn);
-        add(checkInBtn);
-        add(checkOutBtn);
-        add(changeRoomBtn);
-        add(alterClientBtn);
-        add(alterRoomBtn);
-        add(alterLeaderBtn);
-        add(allRoomBtn);
-
-        setVisible(true); // 设置窗口可见
+        
+        return panel;
     }
 
     public static void main(String[] args) {
